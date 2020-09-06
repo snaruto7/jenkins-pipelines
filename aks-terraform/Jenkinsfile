@@ -116,10 +116,14 @@ pipeline {
                 expression { params.Create == 'True'}
             }
             steps{
-                sh '''
-                    az account set --subscription "$AZURE_SUBSCRIPTION_ID"
-                    az aks update -n $cluster_name -g $rg_name --attach-acr $Registry_name
-                '''
+                script{
+                    withCredentials([azureServicePrincipal("${subscription_id}")]){
+                        sh '''
+                            az account set --subscription "$AZURE_SUBSCRIPTION_ID"
+                            az aks update -n $cluster_name -g $rg_name --attach-acr $Registry_name
+                        '''
+                    }
+                }
             }
         }
     }
