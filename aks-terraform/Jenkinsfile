@@ -119,7 +119,8 @@ pipeline {
                 script{
                     withCredentials([azureServicePrincipal("${subscription_id}")]){
                         sh '''
-                            az account set --subscription ""$AZURE_SUBSCRIPTION_ID""
+                            az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID
+                            az account set --subscription $AZURE_SUBSCRIPTION_ID
                             az aks update -n $cluster_name -g $rg_name --attach-acr $Registry_name
                         '''
                     }
