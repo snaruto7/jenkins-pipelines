@@ -24,7 +24,7 @@ pipeline {
         choice( name: 'vm_size', choices: [ 'Standard_DS1_v2','Standard_D2_v2', 'Standard_D2S_v2', 'Standard_B2s', 'Standard_B2ms'], description: 'Enter size for AKS nodes')
         string( name: 'environment', defaultValue: '', description: 'Add the type of environment')
         choice( name: 'Create', choices: ['True','False', 'None'], description: 'Tf infa to be created or destroyed or none')
-        string( name: 'Registry_name', defaultValue: ''. description: 'Name of Container Registry to be created')
+        string( name: 'Registry_name', defaultValue: '', description: 'Name of Container Registry to be created')
     }
     stages{
         stage('Git Checkout'){
