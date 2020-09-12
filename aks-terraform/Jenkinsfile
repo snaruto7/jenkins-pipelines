@@ -25,6 +25,7 @@ pipeline {
         string( name: 'environment', defaultValue: '', description: 'Add the type of environment')
         choice( name: 'Create', choices: ['True','False', 'None'], description: 'Tf infa to be created or destroyed or none')
         string( name: 'Registry_name', defaultValue: '', description: 'Name of Container Registry to be created')
+        string( name: 'keyvault_name', defaultValue: '', description: 'Name of Azure Key Vault to be created')
     }
     stages{
         stage('Git Checkout'){
@@ -49,6 +50,7 @@ pipeline {
                             sed -ie "s|NODE_COUNT|$node_count|g" terraform/terraform.tfvars
                             sed -ie "s|VM_SIZE|$vm_size|g" terraform/terraform.tfvars
                             sed -ie "s|REGISTRY_NAME|$Registry_name|g" terraform/terraform.tfvars
+                            sed -ie "s|KEYVAULT|$keyvault_name|g" terraform/terraform.tfvars
                         '''
                     }
                 }
@@ -75,7 +77,7 @@ pipeline {
             steps{
                 dir('terraform'){
                     sh ''' 
-                        terraform fmt
+                        terraform fmt -recursive
                         terraform init
                     '''
                 }
