@@ -25,7 +25,6 @@ pipeline {
         string( name: 'environment', defaultValue: '', description: 'Add the type of environment')
         choice( name: 'Create', choices: ['True','False', 'None'], description: 'Tf infa to be created or destroyed or none')
         string( name: 'Registry_name', defaultValue: '', description: 'Name of Container Registry to be created')
-        string( name: 'keyvault_name', defaultValue: '', description: 'Name of Azure Key Vault to be created')
     }
     stages{
         stage('Git Checkout'){
@@ -50,7 +49,6 @@ pipeline {
                             sed -ie "s|NODE_COUNT|$node_count|g" terraform/terraform.tfvars
                             sed -ie "s|VM_SIZE|$vm_size|g" terraform/terraform.tfvars
                             sed -ie "s|REGISTRY_NAME|$Registry_name|g" terraform/terraform.tfvars
-                            sed -ie "s|KEYVAULT|$keyvault_name|g" terraform/terraform.tfvars
                         '''
                     }
                 }
@@ -99,7 +97,10 @@ pipeline {
             }
             steps {
                 dir('terraform'){
-                    sh 'terraform apply -auto-approve'
+                    sh '''
+                        terraform plan
+                        terraform apply -auto-approve'
+                    '''
                 }
             }
         }
@@ -110,22 +111,6 @@ pipeline {
             steps {
                 dir('terraform'){
                     sh 'terraform destroy -auto-approve'
-                }
-            }
-        }
-        stage('Attach ACR to k8s'){
-            when {
-                expression { params.Create == 'True'}
-            }
-            steps{
-                script{
-                    withCredentials([azureServicePrincipal("${subscription_id}")]){
-                        sh '''
-                            az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID
-                            az account set --subscription $AZURE_SUBSCRIPTION_ID
-                            az aks update -n $cluster_name -g $rg_name --attach-acr $Registry_name
-                        '''
-                    }
                 }
             }
         }
