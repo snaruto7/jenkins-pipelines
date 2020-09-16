@@ -24,7 +24,6 @@ pipeline {
         choice( name: 'vm_size', choices: [ 'Standard_DS1_v2','Standard_D2_v2', 'Standard_D2S_v2', 'Standard_B2s', 'Standard_B2ms'], description: 'Enter size for AKS nodes')
         string( name: 'environment', defaultValue: '', description: 'Add the type of environment')
         choice( name: 'Create', choices: ['True','False', 'None'], description: 'Tf infa to be created or destroyed or none')
-        string( name: 'Registry_name', defaultValue: '', description: 'Name of Container Registry to be created')
     }
     stages{
         stage('Git Checkout'){
@@ -48,7 +47,6 @@ pipeline {
                             sed -ie "s|DNS_PREFIX|$dns_prefix|g" terraform/terraform.tfvars
                             sed -ie "s|NODE_COUNT|$node_count|g" terraform/terraform.tfvars
                             sed -ie "s|VM_SIZE|$vm_size|g" terraform/terraform.tfvars
-                            sed -ie "s|REGISTRY_NAME|$Registry_name|g" terraform/terraform.tfvars
                         '''
                     }
                 }
